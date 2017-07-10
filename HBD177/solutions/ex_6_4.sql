@@ -1,37 +1,33 @@
-PROCEDURE "calculate_cumulative_sum_of_delivered_products" (  
-    IN IM_PRODUCTS TABLE ( PRODUCTID NVARCHAR(10),  
-                           DELIVERYDATE DAYDATE,
-                          NUM_DELIVERED_PRODUCTS BIGINT ),
-    OUT EX_PRODUCTS TABLE ( PRODUCTID NVARCHAR(10), 
-                            DELIVERYDATE DAYDATE,
-                            NUM_DELIVERED_PRODUCTS BIGINT,
-                          CUMULATIVE_SUM BIGINT )  )
+PROCEDURE "build_products" ( 
+        out ex_products table (PRODUCTID nvarchar(10),
+                               CATEGORY nvarchar(20),
+                               PRICE decimal(15,2) ) )
    LANGUAGE SQLSCRIPT
    SQL SECURITY INVOKER
    --DEFAULT SCHEMA <default_schema_name>
    READS SQL DATA AS
 BEGIN
 
-    DECLARE tmp_productid NVARCHAR(10) = '';
-    DECLARE tmp_cumulated BIGINT       = 0;
-    DECLARE i             INTEGER      = 1;
+ DECLARE lv_index int = 0;
+ DECLARE lv_del_index int array;
+ DECLARE lv_array_index int = 0;
 
-    IF NOT IS_EMPTY(:im_products) THEN
- 
-     ex_products = select products.*, NULL AS CUMULATIVE_SUM FROM :im_products as products;  
+ ex_products = select PRODUCTID, CATEGORY, PRICE from "MD.Products";
+ :ex_products.INSERT(('ProductA', 'Software', '1999.99'), 1);
+ :ex_products.INSERT(('ProductB', 'Software', '2999.99'), 2);
+ :ex_products.INSERT(('ProductC', 'Software', '3999.99'), 3);
 
-      FOR i IN 1..record_count(:EX_PRODUCTS) DO 
-       
-       IF :tmp_productid <> :ex_products.PRODUCTID[:i] THEN
-        tmp_productid  = :ex_products.PRODUCTID[:i];
-        :ex_products.(CUMULATIVE_SUM).update((:ex_products.NUM_DELIVERED_PRODUCTS[:i]), :i );
-       ELSE
-        :ex_products.(CUMULATIVE_SUM).update((:ex_products.CUMULATIVE_SUM[:i-1]
-                    + :ex_products.NUM_DELIVERED_PRODUCTS[:i]), :i );
-       END IF;
+FOR lv_index IN 1..record_count(:ex_products) DO
+  :ex_products.(PRICE).UPDATE((:ex_products.PRICE[lv_index] * 1.25), lv_index);
+END FOR;
 
-      END FOR;
+FOR lv_index IN 1..record_count(:ex_products) DO
+  IF :ex_products.PRICE[lv_index] < 2500.00 THEN
+    lv_array_index = lv_array_index + 1;
+    lv_del_index[lv_array_index] = lv_index;
+  END IF;
+END FOR;
 
-    END IF;
+:ex_products.DELETE(:lv_del_index);
 
 END
