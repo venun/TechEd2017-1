@@ -30,4 +30,4 @@ BEGIN
       ex_emp_addr = select * from :lt_addresses UNION ALL select * from :ex_emp_addr;
   END FOR;
   
-END
+END 

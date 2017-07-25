@@ -13,4 +13,4 @@ BEGIN
  ex_user_filtered_products = APPLY_FILTER(:pre_filtered_products, 
                                          :im_product_filter_string ) ;
 
-END
+END 

@@ -16,7 +16,7 @@ pre_filtered_products = SELECT * FROM "MD.Products"
 user_filtered_products = APPLY_FILTER(:pre_filtered_products, 
                                          :im_product_filter_string ) ;
 
-filtered_items  = 
+filtered_items  =  
         select pi."PRODUCT.PRODUCTID" as PRODUCTID, 
                pi.DELIVERYDATE 
                   from :user_filtered_products as p

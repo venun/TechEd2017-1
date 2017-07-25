@@ -23,4 +23,4 @@ BEGIN
   ex_emp_addr = MAP_MERGE( :lt_employees, 
                            "get_address_func" (:lt_employees."ADDRESSES.ADDRESSID"));
   
-END
+END 

@@ -30,4 +30,4 @@ END FOR;
 
 :ex_products.DELETE(:lv_del_index);
 
-END
+END 
